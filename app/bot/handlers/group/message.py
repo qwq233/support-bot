@@ -90,6 +90,6 @@ async def handler(message: Message, manager: Manager, redis: RedisStorage, album
     # Reply to the edited message with the specified text
     msg = await message.reply(text)
     # Wait for 5 seconds before deleting the reply
-    await asyncio.sleep(5)
+    await asyncio.sleep(1)
     # Delete the reply to the edited message
     await msg.delete()

@@ -59,6 +59,11 @@ async def handle_incoming_message(
     """
     # Check if the user is banned
     if user_data.is_banned:
+        msg = await message.reply("You have been banned by the bot owner.")
+        # Wait for 5 seconds before deleting the reply
+        await asyncio.sleep(5)
+        # Delete the reply to the edited message
+        await msg.delete()
         return
 
     async def copy_message_to_topic():

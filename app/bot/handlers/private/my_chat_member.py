@@ -27,6 +27,9 @@ async def handle_chat_member_update(
     :param manager: Manager object.
     :return: None
     """
+
+    if user_data.is_banned:
+        return
     # Update the user's state based on the new chat member status
     user_data.state = update.new_chat_member.status
     await redis.update_user(user_data.id, user_data)
