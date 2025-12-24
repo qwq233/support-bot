@@ -380,7 +380,7 @@ Learn more at [aeza.net](https://aeza.net/?ref=362599).
 
 **TON** - `EQC-3ilVr-W0Uc3pLrGJElwSaFxvhXXfkiQA3EwdVBHNNess`
 
-**USDT** (TRC-20) - `TGKmm9H3FApFw8xcgRcZDHSku68vozAjo9`
+**USDT** (TRC-20) - `TDHMG7JRkmJBDD1qd4bNhdfoy2uzVd8ixA`
 
 ## Contribution
 
