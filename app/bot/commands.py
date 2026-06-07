@@ -52,24 +52,15 @@ async def setup(bot: Bot, config: Config) -> None:
         ]
     }
 
-    admin_commands = {
-        "en":
-            commands["en"].copy() +
-            [BotCommand(command="newsletter", description="Newsletter menu")],
-        "ru":
-            commands["ru"].copy() +
-            [BotCommand(command="newsletter", description="Меню рассылки")],
-    }
-
     try:
         # Set commands for dev or admin in English language
         await bot.set_my_commands(
-            commands=admin_commands["en"],
+            commands=commands["en"],
             scope=BotCommandScopeChat(chat_id=config.bot.DEV_ID),
         )
         # Set commands for dev or admin in Russian language
         await bot.set_my_commands(
-            commands=admin_commands["ru"],
+            commands=commands["ru"],
             scope=BotCommandScopeChat(chat_id=config.bot.DEV_ID),
             language_code="ru",
         )

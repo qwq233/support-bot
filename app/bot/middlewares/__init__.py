@@ -1,5 +1,4 @@
 from aiogram import Dispatcher
-from aiogram_newsletter.middleware import AiogramNewsletterMiddleware
 
 from .album import AlbumMiddleware
 from .captcha import CaptchaMiddleware
@@ -23,16 +22,16 @@ def register_middlewares(dp: Dispatcher, **kwargs) -> None:
     dp.update.outer_middleware.register(RedisMiddleware(kwargs["redis"]))
     # Register ManagerMiddleware
     dp.update.outer_middleware.register(ManagerMiddleware())
-    # Register CaptchaMiddleware
-    dp.update.outer_middleware.register(CaptchaMiddleware(kwargs["captcha_service"]))
+    # Register CaptchaMiddleware for private events that can be answered directly.
+    captcha_middleware = CaptchaMiddleware(kwargs["captcha_service"])
+    dp.message.outer_middleware.register(captcha_middleware)
+    dp.edited_message.outer_middleware.register(captcha_middleware)
+    dp.callback_query.outer_middleware.register(captcha_middleware)
 
     # Register AlbumMiddleware for message processing
     dp.message.middleware.register(AlbumMiddleware())
     # Register ThrottlingMiddleware for message processing
     dp.message.middleware.register(ThrottlingMiddleware())
-
-    # Register AiogramNewsletterMiddleware for newsletter processing
-    dp.update.middleware.register(AiogramNewsletterMiddleware(kwargs["apscheduler"]))
 
 
 __all__ = [

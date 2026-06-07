@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/tonmendon/ton-subdomain)](https://github.com/tonmendon/ton-subdomain/blob/main/LICENSE)
 [![Telegram Bot](https://img.shields.io/badge/Bot-grey?logo=telegram)](https://core.telegram.org/bots)
-[![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
+[![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3130/)
 [![Redis](https://img.shields.io/badge/Redis-Yes?logo=redis&color=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-blue?logo=docker&logoColor=white)](https://www.docker.com/)
 
@@ -22,16 +22,6 @@ Specific limits are not specified in the documentation, but the community has sh
 <br>
 • Limit on the total number of topics <b>~1M</b>.
 </blockquote>
-
-<details>
-<summary><b>Available bot commands for admins (DEV_ID)</b></summary>
-
-* `/newsletter` - Open the newsletter menu.
-
-  Use this command to initiate a newsletter for users.
-  **Note**: This command works only in private chats.
-
-</details>
 
 <details>
 <summary><b>Available bot commands in the group topics</b></summary>
@@ -121,6 +111,13 @@ Here is a comprehensive reference guide for the environment variables used in th
 | `REDIS_HOST`   | `str` | The hostname or IP address of the Redis server                | `redis`               |
 | `REDIS_PORT`   | `int` | The port number on which the Redis server is running          | `6379`                |
 | `REDIS_DB`     | `int` | The Redis database number                                     | `1`                   |
+| `CAPTCHA_ENABLED` | `bool` | Enable Cloudflare Turnstile verification before chat access | `true`                |
+| `CAPTCHA_PUBLIC_URL` | `str` | Public reverse-proxy URL for the captcha web endpoint      | `https://captcha.example.com` |
+| `TURNSTILE_SITE_KEY` | `str` | Cloudflare Turnstile site key                              | `1x00000000000000000000AA` |
+| `TURNSTILE_SECRET_KEY` | `str` | Cloudflare Turnstile secret key                          | `1x0000000000000000000000000000000AA` |
+| `CAPTCHA_HMAC_SECRET` | `str` | Optional HMAC secret; leave empty to auto-generate and store in Redis | `` |
+| `CAPTCHA_WEB_HOST` | `str` | Local host for the captcha web server                         | `127.0.0.1`           |
+| `CAPTCHA_WEB_PORT` | `int` | Local port for the captcha web server                         | `33804`               |
 
 <details>
 <summary>List of supporting custom emoji ID's</summary>

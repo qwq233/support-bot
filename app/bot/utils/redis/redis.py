@@ -94,7 +94,8 @@ class RedisStorage:
         """
         json_data = json.dumps(data.to_dict())
         await self._set(self.NAME, id_, json_data)
-        await self._update_index(data.message_thread_id, id_)
+        if data.message_thread_id is not None:
+            await self._update_index(data.message_thread_id, id_)
 
     async def get_all_users_ids(self) -> list[int]:
         """

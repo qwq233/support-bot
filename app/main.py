@@ -4,8 +4,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.redis import RedisStorage
-from apscheduler.jobstores.redis import RedisJobStore
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from .bot import commands
 from .bot.handlers import include_routers
@@ -17,7 +15,6 @@ from .logger import setup_logger
 
 
 async def on_shutdown(
-    apscheduler: AsyncIOScheduler,
     dispatcher: Dispatcher,
     config: Config,
     bot: Bot,
@@ -26,15 +23,12 @@ async def on_shutdown(
     """
     Shutdown event handler. This runs when the bot shuts down.
 
-    :param apscheduler: AsyncIOScheduler: The apscheduler instance.
     :param dispatcher: Dispatcher: The bot dispatcher.
     :param config: Config: The config instance.
     :param bot: Bot: The bot instance.
     """
     # Stop captcha web server
     await captcha_service.stop()
-    # Stop apscheduler
-    apscheduler.shutdown()
     # Delete commands and close storage when shutting down
     await commands.delete(bot, config)
     await dispatcher.storage.close()
@@ -43,7 +37,6 @@ async def on_shutdown(
 
 
 async def on_startup(
-    apscheduler: AsyncIOScheduler,
     config: Config,
     bot: Bot,
     captcha_service: CaptchaService,
@@ -51,12 +44,9 @@ async def on_startup(
     """
     Startup event handler. This runs when the bot starts up.
 
-    :param apscheduler: AsyncIOScheduler: The apscheduler instance.
     :param config: Config: The config instance.
     :param bot: Bot: The bot instance.
     """
-    # Start apscheduler
-    apscheduler.start()
     # Setup commands when starting up
     await commands.setup(bot, config)
     # Start captcha web server when enabled
@@ -69,16 +59,6 @@ async def main() -> None:
     """
     # Load config
     config = load_config()
-
-    # Initialize apscheduler
-    job_store = RedisJobStore(
-        host=config.redis.HOST,
-        port=config.redis.PORT,
-        db=config.redis.DB,
-    )
-    apscheduler = AsyncIOScheduler(
-        jobstores={"default": job_store},
-    )
 
     # Initialize Redis storage
     storage = RedisStorage.from_url(
@@ -98,7 +78,6 @@ async def main() -> None:
         redis=UserRedisStorage(storage.redis),
     )
     dp = Dispatcher(
-        apscheduler=apscheduler,
         storage=storage,
         config=config,
         bot=bot,
@@ -117,7 +96,6 @@ async def main() -> None:
         dp,
         config=config,
         redis=storage.redis,
-        apscheduler=apscheduler,
         captcha_service=captcha_service,
     )
 

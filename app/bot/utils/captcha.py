@@ -393,8 +393,6 @@ class CaptchaService:
         )
         if policy.seen or not text:
             return policy.has_url
-        if text.lstrip().startswith("/"):
-            return policy.has_url
         policy.seen = True
         policy.has_url = bool(URL_RE.search(text))
         return policy.has_url
@@ -426,6 +424,10 @@ class CaptchaService:
 
     def render_captcha_page(self, user_id: int, issued_at: int, token: str) -> str:
         site_key = html.escape(self.config.captcha.TURNSTILE_SITE_KEY)
+        verify_url = html.escape(
+            f"{self.config.captcha.PUBLIC_URL.rstrip('/')}/captcha/verify",
+            quote=True,
+        )
         escaped_token = html.escape(token)
         return f"""<!doctype html>
 <html lang="en">
@@ -456,17 +458,6 @@ class CaptchaService:
       font-size: 20px;
       line-height: 1.25;
     }}
-    button {{
-      margin-top: 16px;
-      width: 100%;
-      height: 40px;
-      border: 0;
-      border-radius: 6px;
-      background: #1f6feb;
-      color: #ffffff;
-      font-weight: 600;
-      cursor: pointer;
-    }}
     .fallback {{
       margin-top: 16px;
       font-size: 13px;
@@ -485,7 +476,7 @@ class CaptchaService:
 <body>
   <main>
     <h1>Complete verification</h1>
-    <form id="captcha-form" method="post" action="/captcha/verify">
+    <form id="captcha-form" method="post" action="{verify_url}">
       <input type="hidden" name="uid" value="{user_id}">
       <input type="hidden" name="ts" value="{issued_at}">
       <input type="hidden" name="token" value="{escaped_token}">
@@ -497,7 +488,6 @@ class CaptchaService:
         data-cdata="{user_id}"
         data-callback="onTurnstileSuccess">
       </div>
-      <button type="submit">Continue</button>
       <div class="fallback">The page continues automatically after verification.</div>
     </form>
   </main>
