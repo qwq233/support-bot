@@ -5,6 +5,7 @@ from aiogram_newsletter.manager import ANManager
 
 from app.bot.handlers.private.windows import Window
 from app.bot.manager import Manager
+from app.bot.utils.captcha import needs_captcha
 from app.bot.utils.create_forum_topic import get_or_create_forum_topic
 from app.bot.utils.redis import RedisStorage
 from app.bot.utils.redis.models import UserData
@@ -32,6 +33,9 @@ async def handler(
     :param user_data: UserData object.
     :return: None
     """
+    if needs_captcha(manager.config, manager.user.id, user_data):
+        return
+
     if user_data.language_code:
         await Window.main_menu(manager)
     else:
@@ -55,6 +59,9 @@ async def handler(message: Message, manager: Manager, user_data: UserData) -> No
     :param user_data: UserData object.
     :return: None
     """
+    if needs_captcha(manager.config, manager.user.id, user_data):
+        return
+
     if user_data.language_code:
         await Window.change_language(manager)
     else:
@@ -63,7 +70,7 @@ async def handler(message: Message, manager: Manager, user_data: UserData) -> No
 
 
 @router.message(Command("source"))
-async def handler(message: Message, manager: Manager) -> None:
+async def handler(message: Message, manager: Manager, user_data: UserData) -> None:
     """
     Handles the /source command.
 
@@ -71,6 +78,9 @@ async def handler(message: Message, manager: Manager) -> None:
     :param manager: Manager object.
     :return: None
     """
+    if needs_captcha(manager.config, manager.user.id, user_data):
+        return
+
     text = manager.text_message.get("source")
     await manager.send_message(text)
     await manager.delete_message(message)

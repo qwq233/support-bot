@@ -60,6 +60,15 @@ class TextMessage(Text):
                 "change_language": "<b>Select language:</b>",
                 "main_menu": "<b>Write your question</b>, and we will answer you as soon as possible:",
                 "message_sent": "<b>Message sent!</b> Expect a response.",
+                "captcha_required": (
+                    "<b>Complete verification to continue:</b>\n"
+                    "<a href=\"{url}\">Open verification</a>\n\n"
+                    "After verification, resend your message."
+                ),
+                "captcha_banned": "<b>Verification failed.</b> You have been banned.",
+                "captcha_unavailable": (
+                    "<b>Verification is temporarily unavailable.</b> Try again later."
+                ),
                 "message_edited": (
                     "<b>The message was edited only in your chat.</b> "
                     "To send an edited message, send it as a new message."

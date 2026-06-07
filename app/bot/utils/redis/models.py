@@ -16,6 +16,8 @@ class UserData:
     is_banned: bool = False
     language_code: str | None = None
     created_at: str = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M:%S %Z")
+    captcha_verified: bool = False
+    captcha_attempts: int = 0
 
     def to_dict(self) -> dict:
         """

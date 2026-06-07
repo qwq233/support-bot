@@ -7,6 +7,7 @@ from aiogram.types import Message
 
 from app.bot.manager import Manager
 from app.bot.types.album import Album
+from app.bot.utils.captcha import needs_captcha
 from app.bot.utils.create_forum_topic import (
     create_forum_topic,
     get_or_create_forum_topic,
@@ -19,7 +20,11 @@ router.message.filter(F.chat.type == "private", StateFilter(None))
 
 
 @router.edited_message()
-async def handle_edited_message(message: Message, manager: Manager) -> None:
+async def handle_edited_message(
+        message: Message,
+        manager: Manager,
+        user_data: UserData,
+) -> None:
     """
     Handle edited messages.
 
@@ -27,6 +32,9 @@ async def handle_edited_message(message: Message, manager: Manager) -> None:
     :param manager: Manager object.
     :return: None
     """
+    if needs_captcha(manager.config, manager.user.id, user_data):
+        return
+
     # Get the text for the edited message
     text = manager.text_message.get("message_edited")
     # Reply to the edited message with the specified text
@@ -64,6 +72,9 @@ async def handle_incoming_message(
         await asyncio.sleep(5)
         # Delete the reply to the edited message
         await msg.delete()
+        return
+
+    if needs_captcha(manager.config, manager.user.id, user_data):
         return
 
     async def copy_message_to_topic():

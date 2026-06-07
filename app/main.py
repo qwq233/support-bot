@@ -10,6 +10,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .bot import commands
 from .bot.handlers import include_routers
 from .bot.middlewares import register_middlewares
+from .bot.utils.captcha import CaptchaService
+from .bot.utils.redis import RedisStorage as UserRedisStorage
 from .config import load_config, Config
 from .logger import setup_logger
 
@@ -19,6 +21,7 @@ async def on_shutdown(
     dispatcher: Dispatcher,
     config: Config,
     bot: Bot,
+    captcha_service: CaptchaService,
 ) -> None:
     """
     Shutdown event handler. This runs when the bot shuts down.
@@ -28,6 +31,8 @@ async def on_shutdown(
     :param config: Config: The config instance.
     :param bot: Bot: The bot instance.
     """
+    # Stop captcha web server
+    await captcha_service.stop()
     # Stop apscheduler
     apscheduler.shutdown()
     # Delete commands and close storage when shutting down
@@ -41,6 +46,7 @@ async def on_startup(
     apscheduler: AsyncIOScheduler,
     config: Config,
     bot: Bot,
+    captcha_service: CaptchaService,
 ) -> None:
     """
     Startup event handler. This runs when the bot starts up.
@@ -53,6 +59,8 @@ async def on_startup(
     apscheduler.start()
     # Setup commands when starting up
     await commands.setup(bot, config)
+    # Start captcha web server when enabled
+    await captcha_service.start()
 
 
 async def main() -> None:
@@ -84,11 +92,17 @@ async def main() -> None:
             parse_mode=ParseMode.HTML,
         ),
     )
+    captcha_service = CaptchaService(
+        config=config,
+        bot=bot,
+        redis=UserRedisStorage(storage.redis),
+    )
     dp = Dispatcher(
         apscheduler=apscheduler,
         storage=storage,
         config=config,
         bot=bot,
+        captcha_service=captcha_service,
     )
 
     # Register startup handler
@@ -100,7 +114,11 @@ async def main() -> None:
     include_routers(dp)
     # Register middlewares
     register_middlewares(
-        dp, config=config, redis=storage.redis, apscheduler=apscheduler
+        dp,
+        config=config,
+        redis=storage.redis,
+        apscheduler=apscheduler,
+        captcha_service=captcha_service,
     )
 
     # Start the bot

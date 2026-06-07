@@ -4,6 +4,7 @@ from aiogram.types import CallbackQuery
 
 from app.bot.handlers.private.windows import Window
 from app.bot.manager import Manager
+from app.bot.utils.captcha import needs_captcha
 from app.bot.utils.redis import RedisStorage
 from app.bot.utils.redis.models import UserData
 from app.bot.utils.texts import SUPPORTED_LANGUAGES
@@ -26,6 +27,10 @@ async def handler(call: CallbackQuery, manager: Manager, redis: RedisStorage, us
     :param user_data: UserData object.
     :return: None
     """
+    if needs_captcha(manager.config, manager.user.id, user_data):
+        await call.answer()
+        return
+
     if call.data in SUPPORTED_LANGUAGES.keys():
         user_data.language_code = call.data
         manager.text_message.language_code = call.data

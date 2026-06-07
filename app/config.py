@@ -44,6 +44,22 @@ class RedisConfig:
 
 
 @dataclass
+class CaptchaConfig:
+    """
+    Data class representing the captcha configuration.
+    """
+    ENABLED: bool
+    PUBLIC_URL: str
+    TURNSTILE_SITE_KEY: str
+    TURNSTILE_SECRET_KEY: str
+    HMAC_SECRET: str
+    WEB_HOST: str
+    WEB_PORT: int
+    WINDOW_SECONDS: int = 300
+    MAX_ATTEMPTS: int = 3
+
+
+@dataclass
 class Config:
     """
     Data class representing the overall configuration for the application.
@@ -51,9 +67,11 @@ class Config:
     Attributes:
     - bot (BotConfig): The bot configuration.
     - redis (RedisConfig): The Redis configuration.
+    - captcha (CaptchaConfig): The captcha configuration.
     """
     bot: BotConfig
     redis: RedisConfig
+    captcha: CaptchaConfig
 
 
 def load_config() -> Config:
@@ -76,5 +94,14 @@ def load_config() -> Config:
             HOST=env.str("REDIS_HOST"),
             PORT=env.int("REDIS_PORT"),
             DB=env.int("REDIS_DB"),
+        ),
+        captcha=CaptchaConfig(
+            ENABLED=env.bool("CAPTCHA_ENABLED", True),
+            PUBLIC_URL=env.str("CAPTCHA_PUBLIC_URL", ""),
+            TURNSTILE_SITE_KEY=env.str("TURNSTILE_SITE_KEY", ""),
+            TURNSTILE_SECRET_KEY=env.str("TURNSTILE_SECRET_KEY", ""),
+            HMAC_SECRET=env.str("CAPTCHA_HMAC_SECRET", ""),
+            WEB_HOST=env.str("CAPTCHA_WEB_HOST", "127.0.0.1"),
+            WEB_PORT=env.int("CAPTCHA_WEB_PORT", 33804),
         ),
     )

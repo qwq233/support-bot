@@ -2,6 +2,7 @@ from aiogram import Dispatcher
 from aiogram_newsletter.middleware import AiogramNewsletterMiddleware
 
 from .album import AlbumMiddleware
+from .captcha import CaptchaMiddleware
 from .manager import ManagerMiddleware
 from .redis import RedisMiddleware
 from .throttling import ThrottlingMiddleware
@@ -22,6 +23,8 @@ def register_middlewares(dp: Dispatcher, **kwargs) -> None:
     dp.update.outer_middleware.register(RedisMiddleware(kwargs["redis"]))
     # Register ManagerMiddleware
     dp.update.outer_middleware.register(ManagerMiddleware())
+    # Register CaptchaMiddleware
+    dp.update.outer_middleware.register(CaptchaMiddleware(kwargs["captcha_service"]))
 
     # Register AlbumMiddleware for message processing
     dp.message.middleware.register(AlbumMiddleware())

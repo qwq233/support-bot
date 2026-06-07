@@ -4,6 +4,7 @@ from aiogram.types import ChatMemberUpdated
 from aiogram.utils.markdown import hlink
 
 from app.bot.manager import Manager
+from app.bot.utils.captcha import needs_captcha
 from app.bot.utils.redis import RedisStorage
 from app.bot.utils.redis.models import UserData
 
@@ -33,6 +34,9 @@ async def handle_chat_member_update(
     # Update the user's state based on the new chat member status
     user_data.state = update.new_chat_member.status
     await redis.update_user(user_data.id, user_data)
+
+    if needs_captcha(manager.config, manager.user.id, user_data):
+        return
 
     if user_data.state == ChatMemberStatus.MEMBER:
         text = manager.text_message.get("user_restarted_bot")
